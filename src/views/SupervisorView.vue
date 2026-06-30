@@ -35,7 +35,10 @@ async function handleSubmit() {
     return
   }
   if (numeroReferencia.value.length < 8) {
-    errorMsg.value = 'Número de referencia incompleto'
+    // Nota: el documento de la prueba no especifica el formato del número de
+    // referencia financiera. Se asume un mínimo de 8 dígitos por consistencia
+    // con el formato que el propio backend genera (ver documento de entrega).
+    errorMsg.value = `El número de referencia debe tener al menos 8 dígitos (tiene ${numeroReferencia.value.length})`
     return
   }
   if (numeroTarjeta.value.replace(/\D/g, '').length < 15) {

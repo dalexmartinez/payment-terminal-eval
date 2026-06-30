@@ -16,6 +16,9 @@ import Skeleton from 'primevue/skeleton'
 import TerminalHeader from '../components/TerminalHeader.vue'
 import api from '../services/api'
 import { encryptField } from '../services/crypto'
+import { useVentasStore } from '../stores/ventas'
+
+const ventasStore = useVentasStore()
 
 // ----- Venta -----
 const nombre = ref('')
@@ -73,6 +76,15 @@ async function handleVenta() {
       cvv: encryptField(cvv.value),
     })
     ventaResultado.value = data
+    ventasStore.registrarVenta({
+      numeroAprobacion: data.numeroAprobacion,
+      numeroReferencia: data.numeroReferencia,
+      tarjetaEnmascarada: data.tarjetaEnmascarada,
+      importe: data.importe,
+      nombre: data.nombre,
+      fecha: data.fecha,
+      estatus: 'Aprobada',
+    })
     nombre.value = ''
     importe.value = null
     numeroTarjeta.value = ''
@@ -99,13 +111,20 @@ interface Transaccion {
 const transacciones = ref<Transaccion[]>([])
 const consultasLoading = ref(false)
 const consultasLoaded = ref(false)
+const ventasYaMezcladas = ref(0)
 
 async function cargarConsultas() {
-  if (consultasLoaded.value) return
+  const hayVentasNuevas = ventasStore.ventasLocales.length > ventasYaMezcladas.value
+  if (consultasLoaded.value && !hayVentasNuevas) return
+
   consultasLoading.value = true
   try {
     const { data } = await api.get('/consultas')
-    transacciones.value = data.transacciones
+    // Las ventas hechas en esta sesión (Pinia, en memoria) se anteponen al
+    // mock que regresa el backend, ya que /api/consultas no tiene memoria
+    // de las ventas recién hechas (cada función serverless es independiente).
+    transacciones.value = [...ventasStore.ventasLocales, ...data.transacciones]
+    ventasYaMezcladas.value = ventasStore.ventasLocales.length
     consultasLoaded.value = true
   } finally {
     consultasLoading.value = false
@@ -216,26 +235,27 @@ function formatImporte(value: number) {
                   <Skeleton v-for="i in 5" :key="i" height="2.5rem" style="margin-bottom: 8px" />
                 </div>
               </template>
-              <DataTable
-                v-else
-                :value="transacciones"
-                paginator
-                :rows="8"
-                stripedRows
-                class="pt-table"
-              >
-                <Column field="nombre" header="Nombre" />
-                <Column field="importe" header="Importe">
-                  <template #body="{ data }">{{ formatImporte(data.importe) }}</template>
-                </Column>
-                <Column field="numeroAprobacion" header="Aprobación" class="pt-mono" />
-                <Column field="numeroReferencia" header="Referencia" class="pt-mono" />
-                <Column field="tarjetaEnmascarada" header="Tarjeta" class="pt-mono" />
-                <Column field="fecha" header="Fecha">
-                  <template #body="{ data }">{{ formatFecha(data.fecha) }}</template>
-                </Column>
-                <Column field="estatus" header="Estatus" />
-              </DataTable>
+              <div v-else class="table-scroll">
+                <DataTable
+                  :value="transacciones"
+                  paginator
+                  :rows="8"
+                  stripedRows
+                  class="pt-table"
+                >
+                  <Column field="nombre" header="Nombre" />
+                  <Column field="importe" header="Importe">
+                    <template #body="{ data }">{{ formatImporte(data.importe) }}</template>
+                  </Column>
+                  <Column field="numeroAprobacion" header="Aprobación" class="pt-mono" />
+                  <Column field="numeroReferencia" header="Referencia" class="pt-mono" />
+                  <Column field="tarjetaEnmascarada" header="Tarjeta" class="pt-mono" />
+                  <Column field="fecha" header="Fecha">
+                    <template #body="{ data }">{{ formatFecha(data.fecha) }}</template>
+                  </Column>
+                  <Column field="estatus" header="Estatus" />
+                </DataTable>
+              </div>
             </div>
           </TabPanel>
         </TabPanels>
@@ -333,5 +353,14 @@ function formatImporte(value: number) {
 .table-card {
   margin-top: 16px;
   overflow: hidden;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll :deep(.p-datatable-table) {
+  min-width: 720px;
 }
 </style>

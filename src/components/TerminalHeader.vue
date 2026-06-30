@@ -18,7 +18,7 @@ function handleLogout() {
 <template>
   <header class="terminal-header">
     <div class="left">
-      <p class="pt-eyebrow">Terminal de pagos</p>
+      <p class="pt-eyebrow">SafePay</p>
       <h1>{{ title }}</h1>
     </div>
     <div class="right">

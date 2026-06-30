@@ -1,27 +1,44 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Button from 'primevue/button'
-import Message from 'primevue/message'
 import api from '../services/api'
 import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
+const route = useRoute()
 const auth = useAuthStore()
 
 const username = ref('')
 const password = ref('')
 const loading = ref(false)
-const errorMsg = ref('')
+const usernameError = ref('')
+const passwordError = ref('')
+const sessionNotice = ref('')
+
+onMounted(() => {
+  if (route.query.reason === 'expired') {
+    sessionNotice.value = 'Sesión expirada. Por favor inicia sesión nuevamente.'
+  }
+})
 
 async function handleLogin() {
-  errorMsg.value = ''
-  if (!username.value || !password.value) {
-    errorMsg.value = 'Ingresa usuario y contraseña'
-    return
+  usernameError.value = ''
+  passwordError.value = ''
+  sessionNotice.value = ''
+
+  let hasError = false
+  if (!username.value) {
+    usernameError.value = 'El usuario es requerido'
+    hasError = true
   }
+  if (!password.value) {
+    passwordError.value = 'La contraseña es requerida'
+    hasError = true
+  }
+  if (hasError) return
 
   loading.value = true
   try {
@@ -32,7 +49,9 @@ async function handleLogin() {
     auth.setToken(data.token)
     router.push(auth.role === 'Supervisor' ? '/supervisor' : '/operador')
   } catch (err: any) {
-    errorMsg.value = err.response?.data?.message ?? 'No se pudo iniciar sesión'
+    // El backend solo valida el usuario (la contraseña no se valida realmente
+    // en esta simulación), así que el error de credenciales se asocia al campo usuario.
+    usernameError.value = err.response?.data?.message ?? 'Usuario no encontrado'
   } finally {
     loading.value = false
   }
@@ -45,14 +64,14 @@ async function handleLogin() {
       <div class="brand">
         <span class="brand-dot" />
         <div>
-          <p class="pt-eyebrow">Terminal de pagos</p>
+          <p class="pt-eyebrow">SafePay</p>
           <h1>Acceso al sistema</h1>
         </div>
       </div>
 
-      <p class="hint">
-        Usa <span class="pt-mono">supervisor1</span> o <span class="pt-mono">operador1</span> con cualquier contraseña.
-      </p>
+      <p class="hint">Bienvenido al sistema de SafePay. Inicia sesión para continuar.</p>
+
+      <p v-if="sessionNotice" class="session-notice">{{ sessionNotice }}</p>
 
       <form class="login-form" @submit.prevent="handleLogin">
         <label class="field-label" for="username">Usuario</label>
@@ -62,7 +81,9 @@ async function handleLogin() {
           placeholder="supervisor1"
           autocomplete="username"
           :disabled="loading"
+          :invalid="!!usernameError"
         />
+        <small v-if="usernameError" class="field-error">{{ usernameError }}</small>
 
         <label class="field-label" for="password">Contraseña</label>
         <Password
@@ -73,9 +94,9 @@ async function handleLogin() {
           toggleMask
           fluid
           :disabled="loading"
+          :invalid="!!passwordError"
         />
-
-        <Message v-if="errorMsg" severity="error" :closable="false">{{ errorMsg }}</Message>
+        <small v-if="passwordError" class="field-error">{{ passwordError }}</small>
 
         <Button
           type="submit"
@@ -127,23 +148,38 @@ h1 {
 .hint {
   font-size: 0.85rem;
   color: var(--pt-text-dim);
-  margin: 16px 0 24px;
+  margin: 16px 0 8px;
+}
+
+.session-notice {
+  font-size: 0.82rem;
+  color: var(--pt-danger);
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0 0 16px;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .field-label {
   font-size: 0.8rem;
   color: var(--pt-text-dim);
-  margin-top: 8px;
+  margin-top: 10px;
+}
+
+.field-error {
+  color: var(--pt-danger);
+  font-size: 0.75rem;
 }
 
 .submit-btn {
-  margin-top: 16px;
+  margin-top: 20px;
   width: 100%;
 }
 </style>

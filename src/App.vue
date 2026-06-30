@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import Toast from 'primevue/toast'
+import { useInactivityLogout } from './composables/useInactivityLogout'
+
+useInactivityLogout()
 </script>
 
 <template>
