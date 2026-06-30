@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import Toast from 'primevue/toast'
 </script>
 
 <template>
-  <HelloWorld />
+  <div class="app-shell">
+    <Toast position="top-right" />
+    <router-view />
+  </div>
 </template>
+
+<style>
+.app-shell {
+  min-height: 100vh;
+}
+</style>
