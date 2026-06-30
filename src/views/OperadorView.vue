@@ -235,26 +235,59 @@ function formatImporte(value: number) {
                   <Skeleton v-for="i in 5" :key="i" height="2.5rem" style="margin-bottom: 8px" />
                 </div>
               </template>
-              <div v-else class="table-scroll">
-                <DataTable
-                  :value="transacciones"
-                  paginator
-                  :rows="8"
-                  stripedRows
-                  class="pt-table"
-                >
-                  <Column field="nombre" header="Nombre" />
-                  <Column field="importe" header="Importe">
-                    <template #body="{ data }">{{ formatImporte(data.importe) }}</template>
-                  </Column>
-                  <Column field="numeroAprobacion" header="Aprobación" class="pt-mono" />
-                  <Column field="numeroReferencia" header="Referencia" class="pt-mono" />
-                  <Column field="tarjetaEnmascarada" header="Tarjeta" class="pt-mono" />
-                  <Column field="fecha" header="Fecha">
-                    <template #body="{ data }">{{ formatFecha(data.fecha) }}</template>
-                  </Column>
-                  <Column field="estatus" header="Estatus" />
-                </DataTable>
+              <div v-else>
+                <!-- Vista de tabla: pantallas medianas/grandes -->
+                <div class="table-scroll desktop-only">
+                  <DataTable
+                    :value="transacciones"
+                    paginator
+                    :rows="8"
+                    stripedRows
+                    class="pt-table"
+                  >
+                    <Column field="nombre" header="Nombre" />
+                    <Column field="importe" header="Importe">
+                      <template #body="{ data }">{{ formatImporte(data.importe) }}</template>
+                    </Column>
+                    <Column field="numeroAprobacion" header="Aprobación" class="pt-mono" />
+                    <Column field="numeroReferencia" header="Referencia" class="pt-mono" />
+                    <Column field="tarjetaEnmascarada" header="Tarjeta" class="pt-mono" />
+                    <Column field="fecha" header="Fecha">
+                      <template #body="{ data }">{{ formatFecha(data.fecha) }}</template>
+                    </Column>
+                    <Column field="estatus" header="Estatus" />
+                  </DataTable>
+                </div>
+
+                <!-- Vista de tarjetas apiladas: pantallas angostas (mobile) -->
+                <div class="mobile-only mobile-cards">
+                  <div v-for="(t, i) in transacciones" :key="i" class="mobile-card">
+                    <div class="mobile-card-row main">
+                      <span class="mobile-card-name">{{ t.nombre }}</span>
+                      <span class="mobile-card-amount">{{ formatImporte(t.importe) }}</span>
+                    </div>
+                    <div class="mobile-card-row">
+                      <span class="mobile-card-label">Aprobación</span>
+                      <span class="pt-mono">{{ t.numeroAprobacion }}</span>
+                    </div>
+                    <div class="mobile-card-row">
+                      <span class="mobile-card-label">Referencia</span>
+                      <span class="pt-mono">{{ t.numeroReferencia }}</span>
+                    </div>
+                    <div class="mobile-card-row">
+                      <span class="mobile-card-label">Tarjeta</span>
+                      <span class="pt-mono">{{ t.tarjetaEnmascarada }}</span>
+                    </div>
+                    <div class="mobile-card-row">
+                      <span class="mobile-card-label">Fecha</span>
+                      <span>{{ formatFecha(t.fecha) }}</span>
+                    </div>
+                    <div class="mobile-card-row">
+                      <span class="mobile-card-label">Estatus</span>
+                      <span class="mobile-card-status">{{ t.estatus }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </TabPanel>
@@ -362,5 +395,68 @@ function formatImporte(value: number) {
 
 .table-scroll :deep(.p-datatable-table) {
   min-width: 720px;
+}
+
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+.mobile-cards {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+}
+
+.mobile-card {
+  background: var(--pt-bg);
+  border: 1px solid var(--pt-panel-border);
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.mobile-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 4px 0;
+}
+
+.mobile-card-row.main {
+  padding-bottom: 8px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--pt-panel-border);
+}
+
+.mobile-card-name {
+  font-weight: 600;
+}
+
+.mobile-card-amount {
+  color: var(--pt-accent);
+  font-weight: 600;
+}
+
+.mobile-card-label {
+  color: var(--pt-text-dim);
+  font-size: 0.78rem;
+}
+
+.mobile-card-status {
+  color: var(--pt-accent);
+}
+
+@media (max-width: 640px) {
+  .desktop-only {
+    display: none;
+  }
+  .mobile-only.mobile-cards {
+    display: flex;
+  }
 }
 </style>

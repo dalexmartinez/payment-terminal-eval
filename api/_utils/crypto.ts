@@ -24,3 +24,10 @@ export function randomDigits(length: number): string {
   }
   return result
 }
+
+// Límite defensivo de longitud para cualquier campo de texto libre que llegue
+// al backend (ej. "nombre"). El brief no especifica un máximo, pero aceptar
+// strings sin límite es una mala práctica en cualquier API pública.
+export function isWithinLength(value: unknown, max: number): boolean {
+  return typeof value === 'string' && value.length <= max
+}

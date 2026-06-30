@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { applyCors } from './_utils/cors'
-import { decryptField, maskCard, randomDigits } from './_utils/crypto'
+import { decryptField, maskCard, randomDigits, isWithinLength } from './_utils/crypto'
 import { requireRole } from './_utils/auth'
 
 // POST /api/venta — solo Operador
@@ -19,6 +19,10 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!importe || !nombre || !numeroTarjeta || !fechaExpiracion || !cvv) {
       return res.status(400).json({ message: 'Todos los campos de la venta son requeridos' })
+    }
+
+    if (!isWithinLength(nombre, 100)) {
+      return res.status(400).json({ message: 'El nombre excede la longitud permitida' })
     }
 
     const tarjetaPlano = decryptField(numeroTarjeta)

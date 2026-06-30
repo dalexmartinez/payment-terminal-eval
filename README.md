@@ -71,8 +71,12 @@ La contraseña no se valida realmente en esta simulación; el backend decide el 
 
 **Expiración de sesión por inactividad.** Después de 5 minutos sin interacción (mouse, teclado, scroll, touch), la sesión se cierra automáticamente y se redirige al login con un aviso de "Sesión expirada".
 
+**Seguridad: CORS, CSP y límites de input.** Se restringió CORS de `*` a una lista de orígenes permitidos (dominio de producción + previews de Vercel del proyecto), se agregaron headers de seguridad estándar (`Content-Security-Policy`, `X-Frame-Options`, `X-Content-Type-Options`, `Strict-Transport-Security`), y se validan límites de longitud en los campos de texto libre del backend. Protección contra XSS ya estaba cubierta por defecto: Vue escapa automáticamente cualquier dato dinámico en el template, y no se usa `v-html` ni `innerHTML` en ningún componente. Rate limiting quedó documentado como limitación conocida, no implementado (requiere infraestructura adicional fuera del alcance de esta prueba).
+
+**Tabla de Consultas con vista alterna para mobile.** Además del scroll horizontal, se agregó una vista de tarjetas apiladas para pantallas angostas (menores a 640px), donde cada transacción se muestra como una tarjeta con los datos organizados verticalmente en vez de columnas.
+
 ## Limitaciones conocidas (fuera de alcance de esta prueba)
 
 - No hay base de datos real; los datos de Consultas y los comprobantes son simulados
 - No se valida la firma del JWT (solo se decodifica el payload) — aceptable para esta simulación, pero insuficiente en un backend productivo real
-- La tabla de Consultas no fue optimizada exhaustivamente para pantallas muy angostas más allá de scroll horizontal básico
+- No hay rate limiting en los endpoints (documentado conscientemente, requiere infraestructura adicional)

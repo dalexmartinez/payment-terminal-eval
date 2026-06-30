@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { applyCors } from './_utils/cors'
-import { maskCard, randomDigits } from './_utils/crypto'
+import { maskCard, randomDigits, isWithinLength } from './_utils/crypto'
 import { requireRole } from './_utils/auth'
 
 // PATCH /api/cancelaciones — solo Supervisor
@@ -18,6 +18,10 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!numeroReferencia || !numeroTarjeta || !tipo) {
     return res.status(400).json({ message: 'Número de referencia, tarjeta y tipo son requeridos' })
+  }
+
+  if (!isWithinLength(numeroReferencia, 32) || !isWithinLength(numeroTarjeta, 32)) {
+    return res.status(400).json({ message: 'Referencia o tarjeta exceden la longitud permitida' })
   }
 
   if (!['Cancelacion', 'Devolucion'].includes(tipo)) {
