@@ -157,7 +157,7 @@ function formatImporte(value: number) {
                 <p class="pt-eyebrow">Nueva venta</p>
 
                 <label class="field-label">Nombre del titular</label>
-                <InputText v-model="nombre" placeholder="Nombre completo" :disabled="ventaLoading" />
+                <InputText v-model="nombre" placeholder="Nombre completo" :disabled="ventaLoading" fluid />
 
                 <label class="field-label">Importe</label>
                 <InputNumber
@@ -167,6 +167,7 @@ function formatImporte(value: number) {
                   locale="es-MX"
                   :disabled="ventaLoading"
                   placeholder="$0.00"
+                  fluid
                 />
 
                 <label class="field-label">Número de tarjeta</label>
@@ -176,6 +177,7 @@ function formatImporte(value: number) {
                   placeholder="•••• •••• •••• ••••"
                   class="pt-mono"
                   :disabled="ventaLoading"
+                  fluid
                 />
 
                 <div class="field-row">
@@ -187,6 +189,7 @@ function formatImporte(value: number) {
                       placeholder="MM/AA"
                       class="pt-mono"
                       :disabled="ventaLoading"
+                      fluid
                     />
                   </div>
                   <div>
@@ -197,6 +200,7 @@ function formatImporte(value: number) {
                       placeholder="•••"
                       class="pt-mono"
                       :disabled="ventaLoading"
+                      fluid
                     />
                   </div>
                 </div>
@@ -334,10 +338,32 @@ function formatImporte(value: number) {
   margin-top: 10px;
 }
 
+.form-card :deep(.p-inputtext),
+.form-card :deep(.p-inputmask),
+.form-card :deep(.p-inputnumber),
+.form-card :deep(.p-inputnumber-input),
+.form-card :deep(.p-password),
+.form-card :deep(.p-password-input) {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
 .field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  min-width: 0;
+}
+
+.field-row > div {
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .field-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .submit-btn {

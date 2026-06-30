@@ -26,6 +26,7 @@ body {
   color: var(--pt-text);
   font-family: var(--pt-sans);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 .pt-mono {

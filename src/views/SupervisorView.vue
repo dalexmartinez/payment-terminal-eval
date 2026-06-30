@@ -82,6 +82,7 @@ async function handleSubmit() {
             optionValue="value"
             placeholder="Selecciona una opción"
             :disabled="loading"
+            fluid
           />
 
           <label class="field-label">Número de referencia financiera</label>
@@ -90,6 +91,7 @@ async function handleSubmit() {
             placeholder="00000000"
             class="pt-mono"
             :disabled="loading"
+            fluid
           />
 
           <label class="field-label">Número de tarjeta</label>
@@ -99,6 +101,7 @@ async function handleSubmit() {
             placeholder="•••• •••• •••• ••••"
             class="pt-mono"
             :disabled="loading"
+            fluid
           />
 
           <Message v-if="errorMsg" severity="error" :closable="false">{{ errorMsg }}</Message>
@@ -161,6 +164,14 @@ async function handleSubmit() {
   font-size: 0.8rem;
   color: var(--pt-text-dim);
   margin-top: 10px;
+}
+
+.form-card :deep(.p-inputtext),
+.form-card :deep(.p-inputmask),
+.form-card :deep(.p-select) {
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .submit-btn {
