@@ -1,0 +1,9 @@
+// Tokens generados en jwtbuilder.jamiekurtz.com con claim "role"
+// Solo se usan para SIMULAR la respuesta del login; el Front nunca valida la firma,
+// solo decodifica el payload con jwt-decode.
+
+export const TOKEN_SUPERVISOR =
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3ODI4MzM5ODksImV4cCI6MTgxNDM2OTk4OSwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsInJvbGUiOiJTdXBlcnZpc29yIn0.OQz8wTYDGxIZzLRvg1wqI2m35kQee2xj3fpl-W24oSw'
+
+export const TOKEN_OPERADOR =
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3ODI4MzM5ODksImV4cCI6MTgxNDM2OTk4OSwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsInJvbGUiOiJPcGVyYWRvciJ9.8DqSSnlj1t9mZjYed92eqOUL6EJnH53zIQ4sMmgkOlo'
