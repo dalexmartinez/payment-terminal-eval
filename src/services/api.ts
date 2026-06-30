@@ -6,6 +6,16 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+const TOKEN_STORAGE_KEY = 'pt_token'
+
+api.interceptors.request.use((config) => {
+  const token = sessionStorage.getItem(TOKEN_STORAGE_KEY)
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
 let toast: ToastServiceMethods | null = null
 
 export function bindToast(instance: ToastServiceMethods) {

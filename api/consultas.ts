@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { applyCors } from './_utils/cors'
 import { maskCard, randomDigits } from './_utils/crypto'
+import { requireRole } from './_utils/auth'
 
 interface Transaccion {
   numeroAprobacion: string
@@ -35,13 +36,15 @@ function generarTransacciones(cantidad: number): Transaccion[] {
   })
 }
 
-// GET /api/consultas
+// GET /api/consultas — solo Operador
 export default function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return
 
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Método no permitido' })
   }
+
+  if (!requireRole(req, res, ['Operador'])) return
 
   return res.status(200).json({
     transacciones: generarTransacciones(12),

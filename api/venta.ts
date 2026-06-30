@@ -1,8 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { applyCors } from './_utils/cors'
 import { decryptField, maskCard, randomDigits } from './_utils/crypto'
+import { requireRole } from './_utils/auth'
 
-// POST /api/venta
+// POST /api/venta — solo Operador
 // Body: { importe, nombre, numeroTarjeta (AES), fechaExpiracion (AES), cvv (AES) }
 export default function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return
@@ -10,6 +11,8 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Método no permitido' })
   }
+
+  if (!requireRole(req, res, ['Operador'])) return
 
   try {
     const { importe, nombre, numeroTarjeta, fechaExpiracion, cvv } = req.body ?? {}

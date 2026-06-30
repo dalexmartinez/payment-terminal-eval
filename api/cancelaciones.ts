@@ -1,8 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { applyCors } from './_utils/cors'
 import { maskCard, randomDigits } from './_utils/crypto'
+import { requireRole } from './_utils/auth'
 
-// PATCH /api/cancelaciones
+// PATCH /api/cancelaciones — solo Supervisor
 // Body: { numeroReferencia, numeroTarjeta, tipo: 'Cancelacion' | 'Devolucion' }
 export default function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) return
@@ -10,6 +11,8 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'PATCH') {
     return res.status(405).json({ message: 'Método no permitido' })
   }
+
+  if (!requireRole(req, res, ['Supervisor'])) return
 
   const { numeroReferencia, numeroTarjeta, tipo } = req.body ?? {}
 
